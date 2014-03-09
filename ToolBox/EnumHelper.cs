@@ -16,6 +16,8 @@ namespace ToolBox
         /// <typeparam name="T">type of enum</typeparam>
         /// <param name="value">Array of enum</param>
         /// <returns>Array of integer</returns>
+        /// <exception cref="FormatException">If one value is not in an appropriate format.</exception>
+        /// <exception cref="InvalidCastException">The conversion is not supported.</exception>
         public static int[] ToIntArray<T>(T[] value)
         {
             int[] result = new int[value.Length];
@@ -30,6 +32,7 @@ namespace ToolBox
         /// <typeparam name="T">Type of enum</typeparam>
         /// <param name="value">Array of integer</param>
         /// <returns>Array of enum</returns>
+        /// <exception cref="ArgumentException">one value is not in enum.</exception>
         public static T[] FromIntArray<T>(int[] value)
         {
             T[] result = new T[value.Length];
@@ -45,19 +48,32 @@ namespace ToolBox
         /// <param name="value">String enum value.</param>
         /// <param name="defaultValue">Return if method fail.</param>
         /// <returns>Enum value</returns>
+        /// <exception cref="ArgumentException">T type is not a enum.</exception>
         public static T Parse<T>(string value, T defaultValue)
         {
-            if (Enum.IsDefined(typeof(T), value))
+            if (value != null && Enum.IsDefined(typeof(T), value))
                 return (T)Enum.Parse(typeof(T), value);
 
-            int num;
-            if (int.TryParse(value, out num))
-            {
-                if (Enum.IsDefined(typeof(T), num))
-                    return (T)Enum.ToObject(typeof(T), num);
-            }
-
             return defaultValue;
+        }
+
+        /// <summary>
+        /// Converts the string representation of a enum equivalent.
+        /// A return value indicates whether the conversion succeeded.
+        /// </summary>
+        /// <typeparam name="T">Type of enum</typeparam>
+        /// <param name="value">A string containing a enum value to convert</param>
+        /// <param name="result">Enum value, if the convert is successed</param>
+        /// <returns>true if was converted successfully; otherwise, false</returns>
+        /// <exception cref="ArgumentException">T type is not a enum.</exception>
+        public static bool TryParse<T>(string value, ref T result)
+        {
+            if (value != null && Enum.IsDefined(typeof(T), value))
+            {
+                result = (T)Enum.Parse(typeof(T), value);
+                return true;
+            }
+            return false;
         }
     }
 }
